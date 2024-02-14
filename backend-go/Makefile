@@ -34,4 +34,7 @@ db_down:
 	# drop database
 	docker exec -it fintrax_db dropdb --username=$(DB_USER) --owner=$(DB_USER) $(DB_NAME)
 
+sqlc:
+	sqlc generate
+
 .PHONY:	db/createmigration
