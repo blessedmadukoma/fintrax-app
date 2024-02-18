@@ -73,3 +73,57 @@ func TestUpdateUser(t *testing.T) {
 
 	assert.WithinDuration(t, user.UpdatedAt, time.Now(), 2*time.Second)
 }
+
+func TestGetUserByID(t *testing.T) {
+	user := createRandomUser(t)
+
+	newUser, err := testQuery.GetUserByID(context.Background(), user.ID)
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, newUser)
+
+	assert.Equal(t, newUser.Email, user.Email)
+	assert.Equal(t, newUser.HashedPassword, user.HashedPassword)
+}
+
+func TestGetUserByEmail(t *testing.T) {
+	user := createRandomUser(t)
+
+	newUser, err := testQuery.GetUserByEmail(context.Background(), user.Email)
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, newUser)
+
+	assert.Equal(t, newUser.Email, user.Email)
+	assert.Equal(t, newUser.HashedPassword, user.HashedPassword)
+}
+
+func TestDeleteUser(t *testing.T) {
+	user := createRandomUser(t)
+
+	err := testQuery.DeleteUser(context.Background(), user.ID)
+
+	assert.NoError(t, err)
+
+	newUser, err := testQuery.GetUserByID(context.Background(), user.ID)
+
+	assert.Error(t, err)
+	assert.Empty(t, newUser)
+}
+
+func TestListUsers(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		createRandomUser(t)
+	}
+
+	arg := db.ListUsersParams{
+		Offset: 0,
+		Limit:  10,
+	}
+
+	users, err := testQuery.ListUsers(context.Background(), arg)
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, users)
+	assert.Equal(t, len(users), 10)
+}
