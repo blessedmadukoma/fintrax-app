@@ -5,6 +5,7 @@ import (
 	db "fintrax/db/sqlc"
 	"fintrax/utils"
 	"log"
+	"sync"
 	"testing"
 	"time"
 
@@ -37,6 +38,8 @@ func createRandomUser(t *testing.T) db.User {
 }
 
 func TestCreateUser(t *testing.T) {
+	defer cleanUp()
+
 	user1 := createRandomUser(t)
 
 	// create a new user using the same details and verify if the email is the same: it should return an error
@@ -50,6 +53,8 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
+	defer cleanUp()
+
 	user := createRandomUser(t)
 
 	newPassword, err := utils.GenerateHashPassword(utils.RandomString(8))
@@ -75,6 +80,8 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestGetUserByID(t *testing.T) {
+	defer cleanUp()
+
 	user := createRandomUser(t)
 
 	newUser, err := testQuery.GetUserByID(context.Background(), user.ID)
@@ -87,6 +94,8 @@ func TestGetUserByID(t *testing.T) {
 }
 
 func TestGetUserByEmail(t *testing.T) {
+	defer cleanUp()
+
 	user := createRandomUser(t)
 
 	newUser, err := testQuery.GetUserByEmail(context.Background(), user.Email)
@@ -99,6 +108,8 @@ func TestGetUserByEmail(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
+	defer cleanUp()
+
 	user := createRandomUser(t)
 
 	err := testQuery.DeleteUser(context.Background(), user.ID)
@@ -112,18 +123,37 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestListUsers(t *testing.T) {
-	for i := 0; i < 10; i++ {
-		createRandomUser(t)
+	defer cleanUp()
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < 30; i++ {
+		wg.Add(1) // add the loop to the wg
+
+		go func() {
+			defer wg.Done()
+
+			createRandomUser(t)
+		}()
 	}
+
+	wg.Wait()
 
 	arg := db.ListUsersParams{
 		Offset: 0,
-		Limit:  10,
+		Limit:  30,
 	}
 
 	users, err := testQuery.ListUsers(context.Background(), arg)
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, users)
-	assert.Equal(t, len(users), 10)
+	assert.Equal(t, len(users), 30)
+}
+
+func cleanUp() {
+	err := testQuery.DeleteAllUsers(context.Background())
+	if err != nil {
+		log.Fatal("Error deleting all users:", err)
+	}
 }

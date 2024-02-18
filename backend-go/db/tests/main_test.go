@@ -13,10 +13,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// type DB_URL struct {
-// 	DB_Driver string
-// }
-
 type Config struct {
 	DBDriver    string `mapstructure:"DB_DRIVER"`
 	DBSource    string `mapstructure:"DB_SOURCE"`
