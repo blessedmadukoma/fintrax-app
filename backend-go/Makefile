@@ -29,10 +29,12 @@ pg_down:
 db_up:
 	# create database
 	docker exec -it fintrax_db createdb --username=$(DB_USER) --owner=$(DB_USER) $(DB_NAME)
+	docker exec -it fintrax_db_live createdb --username=$(DB_USER) --owner=$(DB_USER) $(DB_NAME)
 
 db_down:
 	# drop database
 	docker exec -it fintrax_db dropdb --username=$(DB_USER) --owner=$(DB_USER) $(DB_NAME)
+	docker exec -it fintrax_db_live dropdb --username=$(DB_USER) --owner=$(DB_USER) $(DB_NAME)
 
 sqlc:
 	sqlc generate
