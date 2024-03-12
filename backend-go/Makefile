@@ -37,4 +37,10 @@ db_down:
 sqlc:
 	sqlc generate
 
-.PHONY:	db/createmigration
+start:
+	CompileDaemon -command="./fintrax"
+
+test:
+	go test -v -cover ./...
+
+.PHONY:	db/createmigration db/migrateup db/migratedown pg_up pg_down db_up db_down sqlc start test

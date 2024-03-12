@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fintrax/api"
+)
 
 func main() {
-	fmt.Println("Hello Fintrax")
+	server := api.NewServer(".env")
+
+	server.Start(8081)
 }
