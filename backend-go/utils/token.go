@@ -7,6 +7,16 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type JWTToken struct {
+	config *Config
+}
+
+func NewJWTToken(cfg *Config) *JWTToken {
+	return &JWTToken{
+		config: cfg,
+	}
+}
+
 type jwtClaim struct {
 	jwt.RegisteredClaims
 	UserID    int64 `json:"user_id"`
@@ -14,7 +24,7 @@ type jwtClaim struct {
 }
 
 // CreateToken creates a new JWT token
-func CreateToken(user_id int64, signingKey string) (string, error) {
+func (j *JWTToken) CreateToken(user_id int64) (string, error) {
 	claims := jwtClaim{
 		UserID:    user_id,
 		ExpiredAt: time.Now().Add(time.Minute * 15).Unix(),
@@ -22,7 +32,7 @@ func CreateToken(user_id int64, signingKey string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenString, err := token.SignedString([]byte(signingKey))
+	tokenString, err := token.SignedString([]byte(j.config.SIGNINGKEY))
 	if err != nil {
 		return "", err
 	}
@@ -31,14 +41,14 @@ func CreateToken(user_id int64, signingKey string) (string, error) {
 }
 
 // VerifyToken verifies a JWT token
-func VerifyToken(tokenString string, signingKey string) (int64, error) {
+func (j *JWTToken) VerifyToken(tokenString string) (int64, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwtClaim{}, func(token *jwt.Token) (interface{}, error) {
 
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("invalid authentication token")
 		}
 
-		return []byte(signingKey), nil
+		return []byte(j.config.SIGNINGKEY), nil
 	})
 
 	if err != nil {
