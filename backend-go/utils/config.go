@@ -15,6 +15,7 @@ type Config struct {
 	DB_HOST     string `mapstructure:"DB_HOST"`
 	DB_PORT     string `mapstructure:"DB_PORT"`
 	DB_NAME     string `mapstructure:"DB_NAME"`
+	SIGNINGKEY  string `mapstructure:"SIGNING_KEY"`
 
 	DB_SOURCE_LIVE string `mapstructure:"DB_SOURCE_LIVE"`
 }
@@ -31,6 +32,7 @@ func LoadEnvConfig(path string) (config Config) {
 	config.DB_HOST = os.Getenv("DB_HOST")
 	config.DB_PORT = os.Getenv("DB_PORT")
 	config.DB_NAME = os.Getenv("DB_NAME")
+	config.SIGNINGKEY = os.Getenv("SIGNING_KEY")
 
 	config.DB_SOURCE_LIVE = os.Getenv("DB_SOURCE_LIVE")
 
