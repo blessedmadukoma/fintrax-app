@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: fintrax_db
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=fintrax
+    ports:
+      - "5432:5432" # external(my laptop):internal(docker)
+    
+  postgres-live:
+    container_name: fintrax_db_live
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=fintrax
+    ports:
+      - "5433:5432"
