@@ -9,8 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/gin-contrib/cors"
-
 	_ "github.com/lib/pq"
 )
 
@@ -43,7 +41,8 @@ func NewServer(envPath string) *Server {
 	g := gin.Default()
 
 	// CORS
-	g.Use(cors.Default())
+	g.Use(CORS())
+	// g.Use(cors.Default())
 	// g.Use(cors.New(cors.Config{
 	// 	AllowOrigins:     []string{"http://localhost:8000", "*"},
 	// 	AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
