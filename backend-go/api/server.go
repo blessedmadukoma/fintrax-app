@@ -15,7 +15,11 @@ import (
 type Server struct {
 	queries *db.Queries
 	router  *gin.Engine
+	config  *utils.Config
+	// tokenMaker *utils.JWTToken
 }
+
+var tokenController *utils.JWTToken
 
 func NewServer(envPath string) *Server {
 
@@ -30,6 +34,8 @@ func NewServer(envPath string) *Server {
 		panic(fmt.Sprintf("could not connect to db: %v", err))
 	}
 
+	tokenController = utils.NewJWTToken(&config)
+
 	q := db.New(conn)
 
 	g := gin.Default()
@@ -37,6 +43,8 @@ func NewServer(envPath string) *Server {
 	return &Server{
 		queries: q,
 		router:  g,
+		config:  &config,
+		// tokenMaker: jwtToken,
 	}
 
 }
@@ -47,6 +55,7 @@ func (s *Server) Start(port int) {
 	})
 
 	User{}.router(s)
+	Auth{}.router(s)
 
 	s.router.Run(fmt.Sprintf(":%v", port))
 }
